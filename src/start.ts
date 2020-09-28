@@ -97,7 +97,24 @@ export namespace X {
 
     /** 执行任务 */
     export function do_task() {
+        // 清空 dist 文件夹
         fs.emptyDirSync("dist");
+
+        // 处理 main.js，删除不必要的两行代码
+        const mainJsStr = fs.readFileSync("src/web-mobile/main.js").toString();
+        const mainJsLines = mainJsStr.split("\n");
+        const newMainJsLines: string[] = [];
+        mainJsLines.forEach((o) => {
+            if (o.match(/jsList\.push\(bundledScript\);/)) {
+                return;
+            }
+            if (o.match(/jsList\ =\ \[bundledScript\];/)) {
+                return;
+            }
+            newMainJsLines.push(o);
+        });
+        const newMainJsStr = newMainJsLines.join("\n");
+        fs.writeFileSync("src/web-mobile/main.js", newMainJsStr);
 
         // 前置:将res资源写成res.js
         console.time("写入res.js")
