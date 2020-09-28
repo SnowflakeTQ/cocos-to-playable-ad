@@ -29,8 +29,8 @@ export namespace X {
             tempDir + "/main.js",
             tempDir + "/src/settings.js",
             tempDir + "/src/project.js",
-            __dirname + "/new-res-loader.js",
-            __dirname + "/game-start.js",
+            __dirname + "/../libs/new-res-loader.js",
+            __dirname + "/../libs/game-start.js",
         ],
     }
 
