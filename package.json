@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/fkworld/cocos-to-playable-ad#readme",
   "bin": {
-    "cocos-to-playable-ads": "dist/index.js"
+    "cocos-to-playable-ad": "./dist/index.js"
   }
 }
