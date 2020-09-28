@@ -111,6 +111,9 @@ export namespace X {
             if (o.match(/jsList\ =\ \[bundledScript\];/)) {
                 return;
             }
+            if (o.match(/setLoadingDisplay\(\);/)) {
+                return;
+            }
             newMainJsLines.push(o);
         });
         const newMainJsStr = newMainJsLines.join("\n");
@@ -126,6 +129,9 @@ export namespace X {
         let html = get_file_content(C.INPUT_HTML_FILE)
         html = html.replace(/<link rel="stylesheet".*\/>/gs, "")
         html = html.replace(/<script.*<\/script>/gs, "")
+        html = html.replace(/<link rel="icon" href="favicon.ico"\/>/gs, "")
+        html = html.replace(/<div id="splash">.*<\/div>/s, "")
+        
         console.timeEnd("清理html")
 
         // 写入css
