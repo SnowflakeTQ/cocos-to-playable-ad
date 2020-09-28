@@ -1,7 +1,9 @@
-import * as fs from "fs-extra"
-import * as path from "path"
-import * as uglify from "uglify-js"
+import * as fs from "fs-extra";
+import * as path from "path";
 import CleanCSS = require("clean-css")
+
+const webMobileDir = process.argv[2];
+const tempDir = ".temp";
 
 export namespace X {
 
@@ -9,25 +11,26 @@ export namespace X {
      * - [注意] 路径问题.start脚本与web-mobile同层级,因此相对路径需要带上web-mobile;cocos在调用资源时没有web-mobile,需要在最后去掉
      */
     const C = {
-        BASE_PATH: "src/web-mobile",            // web-mobile包基础路径
-        RES_PATH: "src/web-mobile/res",         // web-mobile包下的res路径
+        BASE_PATH: tempDir,            // web-mobile包基础路径
+        RES_PATH: tempDir + "/res",         // web-mobile包下的res路径
         RES_BASE64_EXTNAME_SET: new Set([       // 需要使用base64编码的资源后缀(根据项目自行扩充)
             ".png", ".jpg", ".webp", ".mp3",
         ]),
-        OUTPUT_RES_JS: "dist/res.js",           // 输出文件res.js
-        OUTPUT_INDEX_HTML: "dist/index.html",   // 输出文件index.html的路径
-        INPUT_HTML_FILE: "src/web-mobile/index.html",
+        OUTPUT_RES_JS: tempDir + "/res.js",           // 输出文件res.js
+        OUTPUT_INDEX_HTML: "index.html",   // 输出文件index.html的路径
+        INPUT_HTML_FILE: tempDir + "/index.html",
         INPUT_CSS_FILES: [
-            "src/web-mobile/style-mobile.css"
+            tempDir + "/style-mobile.css"
         ],
+        MAIN_JS_FILE: tempDir + "/main.js",
         INPUT_JS_FILES: [
-            "dist/res.js",                      // 注意这里先输出再输入
-            "src/web-mobile/cocos2d-js-min.js",
-            "src/web-mobile/main.js",
-            "src/web-mobile/src/settings.js",
-            "src/web-mobile/src/project.js",
-            "src/new-res-loader.js",
-            "src/game-start.js",
+            tempDir + "/res.js",                      // 注意这里先输出再输入
+            tempDir + "/cocos2d-js-min.js",
+            tempDir + "/main.js",
+            tempDir + "/src/settings.js",
+            tempDir + "/src/project.js",
+            __dirname + "/new-res-loader.js",
+            __dirname + "/game-start.js",
         ],
     }
 
@@ -97,11 +100,14 @@ export namespace X {
 
     /** 执行任务 */
     export function do_task() {
-        // 清空 dist 文件夹
-        fs.emptyDirSync("dist");
+        // 清空 temp 文件夹，拷贝 web-mobile 到 temp 目录
+        fs.emptyDirSync(tempDir);
+        fs.copySync(webMobileDir, tempDir)
+        fs.removeSync(C.OUTPUT_INDEX_HTML);
 
         // 处理 main.js，删除不必要的两行代码
-        const mainJsStr = fs.readFileSync("src/web-mobile/main.js").toString();
+        console.time("处理 main.js")
+        const mainJsStr = fs.readFileSync(C.MAIN_JS_FILE).toString();
         const mainJsLines = mainJsStr.split("\n");
         const newMainJsLines: string[] = [];
         mainJsLines.forEach((o) => {
@@ -117,7 +123,8 @@ export namespace X {
             newMainJsLines.push(o);
         });
         const newMainJsStr = newMainJsLines.join("\n");
-        fs.writeFileSync("src/web-mobile/main.js", newMainJsStr);
+        fs.writeFileSync(C.MAIN_JS_FILE, newMainJsStr);
+        console.timeEnd("处理 main.js")
 
         // 前置:将res资源写成res.js
         console.time("写入res.js")
@@ -131,7 +138,6 @@ export namespace X {
         html = html.replace(/<script.*<\/script>/gs, "")
         html = html.replace(/<link rel="icon" href="favicon.ico"\/>/gs, "")
         html = html.replace(/<div id="splash">.*<\/div>/s, "")
-        
         console.timeEnd("清理html")
 
         // 写入css
