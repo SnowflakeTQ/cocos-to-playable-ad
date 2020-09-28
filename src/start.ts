@@ -81,8 +81,11 @@ export namespace X {
     /** 将js文件转化为html文件内容(包括压缩过程) */
     function get_html_code_by_js_file(js_filepath: string): string {
         let js = get_file_content(js_filepath)
-        let min_js = uglify.minify(js).code
-        return `<script type="text/javascript">${min_js}</script>`
+
+        // let min_js = uglify.minify(js).code
+        // return `<script type="text/javascript">${min_js}</script>`
+
+        return `<script type="text/javascript">${js}</script>`
     }
 
     /** 将css文件转化为html文件内容(包括压缩过程) */
