@@ -30,6 +30,17 @@ function base64DecToArr(sBase64, nBlockSize) {
     return aBytes
 }
 
+function loadImg(extName, item, callback) {
+    var img = new Image()
+    function loadCallback () {
+        img.removeEventListener('load', loadCallback);
+        img.id = item.id;
+        callback(null, img);
+    }
+    img.addEventListener('load', loadCallback);
+    img.src = `data:image/${extName};base64,` + window.res[item.url]   // 注意需要给base64编码添加前缀
+}
+
 /**
  * 修改部分资源的载入方式,可以根据项目中实际用到的资源进行修改
  * - [注意] window.res 是自己定义的,名称可以修改
@@ -38,23 +49,20 @@ cc.loader.addDownloadHandlers({
     json: function (item, callback) {
         callback(null, window.res[item.url])
     },
+    atlas: function (item, callback) {
+        callback(null, window.res[item.url])
+    },
     plist: function (item, callback) {
         callback(null, window.res[item.url])
     },
     png: function (item, callback) {
-        var img = new Image()
-        img.src = "data:image/png;base64," + window.res[item.url]   // 注意需要给base64编码添加前缀
-        callback(null, img)
+        loadImg("png", item, callback);
     },
     jpg: function (item, callback) {
-        var img = new Image()
-        img.src = "data:image/jpeg;base64," + window.res[item.url]
-        callback(null, img)
+        loadImg("jpeg", item, callback);
     },
     webp: function (item, callback) {
-        var img = new Image()
-        img.src = "data:image/webp;base64," + window.res[item.url]
-        callback(null, img)
+        loadImg("webp", item, callback);
     },
     mp3: function (item, callback) {
         // 只支持以webAudio形式播放的声音
@@ -70,5 +78,5 @@ cc.loader.addDownloadHandlers({
                 callback(new Error("mp3-res-fail"), null)
             }
         )
-    },
+    }
 })
