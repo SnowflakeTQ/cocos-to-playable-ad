@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "将 cocos creator 构建出来的 web-mobile 项目打包为 playable-ad 项目，即单 html 文件。",
   "main": "start.ts",
-  "dependencies": {},
+  "dependencies": {
+    "fs-extra": "^9.0.1"
+  },
   "devDependencies": {
     "@types/clean-css": "^4.2.1",
+    "@types/fs-extra": "^9.0.1",
     "@types/node": "^12.7.8",
     "@types/uglify-js": "^3.0.4",
     "clean-css": "^4.2.1",
